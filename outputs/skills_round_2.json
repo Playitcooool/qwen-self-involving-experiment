@@ -1,0 +1,62 @@
+[
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $12 + 15 = 27$\n    *   Step 2: Multiply the result by 5.\n        *   $27 *"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Expression: $(5 + 7) * 7 - 7$\n    *   Step 1: Parentheses.\n        *   $5 + 7 = 12$\n    *   Step 2: Multiplication."
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $5 + 16 = 21$\n    *   Step 2: Multiply the result by 4.\n        *   $21 * 4"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "*   The user wants the answer to be an integer.\n    *   The user wants the answer to be the exact value.\n    *   The user wants the answer to be the integer.\n    *   The user wants the answer to be the integer.\n    *   The user wants"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 16,30,23,18\".\n    *   Wait, the prompt says \"Your answer: 16,30,23,18\".\n    *   Wait, the prompt says \"Your answer"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 21,15,28,25,21\".\n    *   Wait, the prompt says \"Your answer: 21,15,28,25,21\".\n    *   Wait,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Analyze the Input:**\n    *   List: [25, 25, 1, 5, 19, 12, 27]\n    *   Condition: >= 10\n    *   Filter:\n        *   2"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Evaluate the Input:**\n    *   List: [1, 18, 21, 3, 28, 25, 6]\n    *   Filter: >= 10\n    *   Numbers >= 10: 18,"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\n\n</think>\n\nThe specific error occurs because the verifier is using a **case-insensitive** comparison (`==`) to match the input string \"orbit pearl pearl\" against the expected output \"pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl pearl"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A list of words (\"amber\", \"cedar\", \"amber\").\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected Output: \"amber|ced"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\n\n</think>\n\nThe specific error occurs because the `split()` method in Python splits by **any whitespace**, including spaces, tabs, and newlines. Since the input string \"violet amber cedar\" contains spaces, it is split into multiple words: `['violet', 'amber', 'cedar']"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A series of examples of a task.\n    *   Task: Reverse each word in a list and join them with `|`.\n    *   Input Words: `pearl linen orbit`"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $3 + 15 = 18$\n    *   Step 2: Multiply the result by 3.\n        *   $18 * 3"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $17 + 5 = 22$\n    *   Step 2: Multiply the result by 3.\n        *   $22 * 3"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Expression: $(5 + 18) * 5 - 18$\n    *   Step 1: Parentheses.\n        *   $5 + 18 = 23$\n    *   Step 2:"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $12 + 18 = 30$\n    *   Step 2: Multiply the result by 6.\n        *   $30 *"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 28,21,27,27\".\n    *   Wait, the prompt says \"Your answer: 28,21,27,27\".\n    *   Wait, the prompt says \"Your answer"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Analyze the Input:**\n    *   List: [9, 12, 23, 22, 4, 4, 22]\n    *   Condition: >= 13\n    *   Numbers >= 13: 23"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 27,30\".\n    *   Wait, the prompt says \"Your answer: 27,30\".\n    *   Wait, the prompt says \"Your answer: 27,30\".\n    *"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Evaluate the Input:**\n    *   List: [12, 18, 1, 10, 7, 3, 16]\n    *   Filter: >= 10\n    *   12 >= 10 -> Yes"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "The specific error is that the verifier is not using the correct method to reverse each word.\nThe specific error is that the verifier is not using the correct method to reverse each word.\nThe specific error is that the verifier is not using the correct method to reverse each word.\nThe specific error is that the"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "2.  **Analyze the Input:**\n    *   Input string: \"Words: cedar violet pearl\"\n    *   Task: Reverse each word and join the results with |.\n    *   Output format: \"Words: cedar violet pearl\"\n    *   Wait, the prompt says \""
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: \"Words: orbit linen linen\" (Wait, the prompt says \"Words: orbit linen linen\" but the actual text provided in the prompt is \"Words: orbit linen linen\" followed by \"Your answer:"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A list of words: \"amber\", \"violet\", \"violet\", \"violet\".\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected"
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object is not compacted. The `compact()` function in Python's json module is required to ensure the output is a single-line string.\nThe procedure is:\n```python\nimport json\ndata = {\"name\": \"Mika\", \"age\": 18, \""
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object is not compacted. The `compact` function in Python's json module is required to ensure the output is a single-line string.\nThe procedure is:\n```python\nimport json\ndata = {\"name\": \"Lin\", \"age\": 44, \"city"
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object must be compact (no spaces after colons), but the verifier expects standard JSON formatting (spaces after colons).\nThe reusable procedure is to use `json.dumps(obj, separators=(',', ':'))` to ensure compact output.\nThe verifier answer is incorrect because it uses `"
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object is not compact. The keys are separated by commas, which violates the compact requirement.\nTo fix this, use `json.dumps()` with the `separators` parameter set to `(',', ':')` to ensure the output is a single line with no spaces.\nThe"
+  }
+]

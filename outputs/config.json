@@ -1,0 +1,10 @@
+{
+  "model_path": "/Volumes/Samsung/lmstudio/lmstudio-community/Qwen:Qwen3.5-0.8B",
+  "rounds": 5,
+  "train_per_family": 4,
+  "test_per_family": 10,
+  "seed": 42,
+  "output": "outputs",
+  "torch": "2.13.0",
+  "device": "mps"
+}

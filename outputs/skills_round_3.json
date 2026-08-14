@@ -1,0 +1,57 @@
+[
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "Wait, the prompt says \"Your answer: 39\".\nLet me re-read the prompt carefully.\n\"Task: Compute exactly. Return only the integer. (3 + 6) * 5 - 6 = ?\nYour answer: 39\"\nWait, the prompt says \""
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $13 + 4 = 17$\n    *   Step 2: Multiply the result by 2.\n        *   $17 * 2"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "The error is in the order of operations. The expression is evaluated as (9 + 13) * 2 - 13, not 9 + (13 * 2) - 13.\nThe correct procedure is to first calculate the sum inside the parentheses, then multiply by"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 23,26,27,27,29\".\n    *   Wait, the prompt says \"Your answer: 23,26,27,27,29\".\n    *   Wait,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Evaluate the Input:**\n    *   List: [10, 4, 7, 24, 8, 21, 8]\n    *   Filter: >= 21\n    *   Numbers >= 21: 24,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "The error is that the verifier is checking the list against the original list, but the original list is not provided in the prompt.\nThe verifier is checking the list against the original list, but the original list is not provided in the prompt.\nThe verifier is checking the list against the original list, but the"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A list of words (\"amber pearl amber\").\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected Output: \"amber pearl amber\" (Wait, the"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "The error is that the `split()` method splits on any whitespace, including newlines, so the words are not separated correctly.\nThe reusable procedure is:\n```python\nwords = input().split()\nresult = []\nfor word in words:\n    result.append(word[::-1])\nprint(\""
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A list of words (\"violet violet orbit\").\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected Output: `| violet orbit | violet orbit |"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A set of words (\"cedar\", \"orbit\", \"violet\").\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected Output: `|`"
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object must be compact (no spaces after colons), but the verifier expects standard JSON formatting (spaces after colons).\nThe reusable procedure is to use `json.dumps(obj, separators=(',', ':'))` to ensure compact output.\nThe verifier answer is incorrect because it uses `"
+  }
+]

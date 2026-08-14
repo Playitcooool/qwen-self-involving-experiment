@@ -1,0 +1,57 @@
+[
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "The error is that the user is using the wrong order of operations.\nThe correct order of operations is:\n1.  First, calculate the expression inside the parentheses: $5 + 2 = 7$.\n2.  Then, multiply the result by 6: $7 \\times 6"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $15 + 16 = 31$\n    *   Step 2: Multiply the result by 9.\n        *   $31 *"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "The error is in the order of operations. The expression is (3 + 11) * 6 - 11.\nThe correct order is:\n1.  Add 3 and 11: 3 + 11 = 14\n2.  Multiply the result by"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 22,18,21,24,20\".\n    *   Wait, the prompt says \"Your answer: 22,18,21,24,20\".\n    *   Wait,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 15,21,17,22,26\".\n    *   Wait, the prompt says \"Your answer: 15,21,17,22,26\".\n    *   Wait,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 21,21,18,27,24\".\n    *   Wait, the prompt says \"Your answer: 21,21,18,27,24\".\n    *   Wait,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 20,19,11,15,28\".\n    *   Wait, the prompt says \"Your answer: 20,19,11,15,28\".\n    *   Wait,"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "*   Wait, the user prompt says \"Your answer: cloth\" but then asks \"Reverse each word and join the results with |. Return only the result. Words: orbit violet linen cloth\".\n    *   Wait, the user prompt says \"Your answer: cloth\" but then asks \"Reverse each"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A series of instructions and examples.\n    *   Task: Reverse each word and join the results with `|`.\n    *   Input Words: `linen`, `pearl`, `linen"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A set of words (\"cedar amber pearl\") and a verifier answer (\"radec|rebma|lraep\").\n    *   Task: Reverse each word and join the results with `|`."
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A list of words: `orbit`, `violet`, `orbit`.\n    *   Task: Reverse each word and join the results with `|`.\n    *   Expected Output (based on the"
+  }
+]

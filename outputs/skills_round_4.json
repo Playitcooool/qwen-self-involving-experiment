@@ -1,0 +1,62 @@
+[
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "The error is in the order of operations. The expression is evaluated as (10 + 8) * 8 - 8, which equals 120. The verifier's answer of 136 is incorrect because it appears to be the result of a different calculation (likely (10 +"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Step 1: Calculate the sum inside the parentheses.\n        *   $16 + 19 = 35$\n    *   Step 2: Multiply the result by 8.\n        *   $35 *"
+  },
+  {
+    "family": "arithmetic",
+    "skill": "For nested arithmetic, compute the parentheses first, then multiply, then subtract.",
+    "reflection": "2.  **Evaluate the Expression:**\n    *   Expression: $(13 + 10) * 6 - 10$\n    *   Step 1: Parentheses.\n        *   $13 + 10 = 23$\n    *   Step"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Evaluate the Input:**\n    *   List: [24, 28, 17, 13, 2, 5, 1]\n    *   Filter: >= 20\n    *   24 >= 20 -> Keep"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "The error is that the verifier is checking the list against the original list, but the verifier is not comparing the elements of the original list against the elements of the list being kept.\nThe verifier is checking the list against the original list, but the verifier is not comparing the elements of the original list against the elements"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "*   Wait, the prompt says \"Your answer: 29,16,29,26,20,14,22\".\n    *   Wait, the prompt says \"Your answer: 29,16,29,26,20,"
+  },
+  {
+    "family": "filter",
+    "skill": "For filtering, scan every element once, preserve original order, and emit only qualifying values.",
+    "reflection": "2.  **Analyze the Input:**\n    *   List: [2, 20, 2, 14, 13, 24, 2]\n    *   Filter: >= 8\n    *   Numbers >= 8: 20,"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: \"Words: cedar orbit linen\" (Note: The prompt says \"Words: cedar orbit linen\" but the example output provided in the prompt is \"radec|tibro|nenil\". Wait, looking"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: \"Words: amber linen linen\" (Wait, the prompt says \"Words: amber linen linen\" but the example output provided in the prompt is \"verifier answer: rebma|nenil|nenil"
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "<think>\nHere's a thinking process that leads to the suggested explanation and procedure:\n\n1.  **Analyze the Request:**\n    *   **Input:** A list of words: `pearl cedar cedar`.\n    *   **Task:** Reverse each word and join the results with `|`."
+  },
+  {
+    "family": "transform",
+    "skill": "For per-item transformation, transform each item independently, then join using exactly the requested delimiter.",
+    "reflection": "2.  **Analyze the Input:**\n    *   Input string: \"Words: violet cedar pearl\"\n    *   Task: Reverse each word and join the results with |.\n    *   Output format: \"Return only the result.\"\n    *   Wait, the user prompt says \""
+  },
+  {
+    "family": "json",
+    "skill": "For constrained JSON, copy the requested keys exactly, use valid JSON double quotes, and omit commentary.",
+    "reflection": "The error occurs because the JSON object must be compact (no spaces after colons or commas) and the keys must be lowercase. The verifier's answer uses uppercase keys and spaces, which violates the compactness requirement.\nTo fix this, use the following procedure:\n1. Define a function `get_json_object"
+  }
+]
