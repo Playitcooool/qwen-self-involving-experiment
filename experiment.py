@@ -64,11 +64,11 @@ class Runner:
             base = PeftModel.from_pretrained(base, adapter)
         self.model = base.eval()
 
-    def generate(self, prompt: str, prefix: str = "") -> str:
+    def generate(self, prompt: str, prefix: str = "", max_new_tokens: int = 64) -> str:
         text = (prefix + "\n" if prefix else "") + prompt
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
         with torch.inference_mode():
-            out = self.model.generate(**inputs, max_new_tokens=64, do_sample=False, temperature=1.0)
+            out = self.model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False, temperature=1.0)
         return self.tokenizer.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
 
 

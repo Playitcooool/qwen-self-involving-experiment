@@ -3,5 +3,6 @@ __pycache__/
 *.py[cod]
 .DS_Store
 outputs/**/adapters/
+data_cache/
 models/
 data/generated/

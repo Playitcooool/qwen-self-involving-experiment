@@ -28,6 +28,8 @@ A separate reward-only GRPO-style run is also included. It reached 0.300 at roun
 
 The multi-type held-out suite in `outputs/benchmark_suite/` covers word-problem math, rule reasoning, and executable Python functions. On this suite, baseline/SFT/GRPO each scored 0.333, while the external-skill condition scored 0.361. This small suite is diagnostic rather than definitive: math was unsolved by every condition and the code slice did not separate methods.
 
+The real-data subset evaluation in `outputs/real_benchmark/` uses public [GSM8K](https://huggingface.co/datasets/openai/gsm8k), [HumanEval](https://huggingface.co/datasets/openai/openai_humaneval), and [ARC-Challenge](https://huggingface.co/datasets/allenai/ai2_arc) test data. Results are reported as a fixed subset evaluation, not official full-set scores: baseline 0.486, SFT 0.429, GRPO 0.457, and external skill 0.243 overall.
+
 ## Design
 
 The benchmark has four exact-match task families: arithmetic, list filtering, string transformation, and constraint-following JSON. Each round uses fresh exploration tasks. Both improvement conditions see the same failed attempts, verifier feedback, and self-analysis prompt; only the storage mechanism differs.
