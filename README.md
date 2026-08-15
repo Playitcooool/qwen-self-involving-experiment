@@ -24,6 +24,8 @@ Results are written to `outputs/`, including JSONL predictions, CSV metrics, and
 
 The completed run reached 0.150 baseline accuracy and 0.325 training-based accuracy at round 5 (0.350 at round 4). The original skill-card interface scored 0.000; a deduplicated silent-card retry scored 0.175 in every round. See `outputs/report.md` for details.
 
+A separate reward-only GRPO-style run is also included. It reached 0.300 at round 5 from the same 0.150 baseline, using group-relative verifier rewards rather than answer-token SFT labels. Its artifacts are in `outputs/grpo/`.
+
 ## Design
 
 The benchmark has four exact-match task families: arithmetic, list filtering, string transformation, and constraint-following JSON. Each round uses fresh exploration tasks. Both improvement conditions see the same failed attempts, verifier feedback, and self-analysis prompt; only the storage mechanism differs.
