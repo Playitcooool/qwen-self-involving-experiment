@@ -22,7 +22,7 @@ uv run python experiment.py \
 
 Results are written to `outputs/`, including JSONL predictions, CSV metrics, and `report.md`.
 
-The completed run reached 0.150 baseline accuracy, 0.325 training-based accuracy at round 5 (0.350 at round 4), and 0.000 for the tested skill-card interface. See `outputs/report.md` for the caveat that the skill condition copied injected procedures instead of applying them reliably.
+The completed run reached 0.150 baseline accuracy and 0.325 training-based accuracy at round 5 (0.350 at round 4). The original skill-card interface scored 0.000; a deduplicated silent-card retry scored 0.175 in every round. See `outputs/report.md` for details.
 
 ## Design
 

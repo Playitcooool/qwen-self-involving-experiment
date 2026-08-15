@@ -21,4 +21,8 @@ In this implementation, offline training improved exact-match performance from 0
 
 The training gain was concentrated in constrained JSON and arithmetic. Filtering and string transformation remained unsolved. Because the benchmark is small and synthetic, these results should be treated as an implementation-level comparison and not as a general capability claim.
 
+## Skill-interface retry
+
+The original skill condition accidentally injected a long sequence of duplicate cards and scored 0.000. A controlled retry deduplicated to one card per family and explicitly instructed the model to use the procedure silently. The retry scored **0.175 in every round**, with arithmetic at 0.300, JSON at 0.400, and filtering/transformation at 0.000. This is a more useful estimate of the tested skill interface, but it still shows no cumulative improvement from adding more cards.
+
 This report is generated from 440 prediction records and five saved LoRA adapters. The complete per-example data are in `predictions.jsonl`.
