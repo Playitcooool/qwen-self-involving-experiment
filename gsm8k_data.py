@@ -56,6 +56,19 @@ def tasks_from_indices(
     return [row_to_task(rows[index], index, split) for index in indices]
 
 
+def tasks_from_ids(rows: Sequence[dict[str, Any]], task_ids: Sequence[str]) -> list[Task]:
+    tasks: list[Task] = []
+    for task_id in task_ids:
+        prefix, split, raw_index = task_id.split(":", 2)
+        if prefix != "gsm8k" or split != "train":
+            raise ValueError(f"unsupported GSM8K task ID: {task_id}")
+        index = int(raw_index)
+        if index < 0 or index >= len(rows):
+            raise ValueError(f"GSM8K task index out of range: {task_id}")
+        tasks.append(row_to_task(rows[index], index, split))
+    return tasks
+
+
 @dataclass
 class GSM8KDataSplits:
     bank: list[Task]
@@ -139,6 +152,27 @@ def build_gsm8k_splits(
     manifest = data.manifest()
     if any(manifest["overlap_checks"].values()):
         raise RuntimeError("GSM8K split construction produced overlapping task IDs")
+    return data
+
+
+def load_gsm8k_splits_from_manifest(path: Path) -> GSM8KDataSplits:
+    manifest = json.loads(path.read_text())
+    rows = load_gsm8k_rows("train")
+    data = GSM8KDataSplits(
+        bank=tasks_from_ids(rows, manifest["bank_task_ids"]),
+        update_rounds=[tasks_from_ids(rows, ids) for ids in manifest["update_task_ids_by_round"]],
+        validation=tasks_from_ids(rows, manifest["validation_task_ids"]),
+        source=manifest["source"],
+    )
+    actual = data.manifest()
+    if actual["bank_task_ids"] != manifest["bank_task_ids"]:
+        raise RuntimeError("GSM8K bank task IDs do not reproduce the saved manifest")
+    if actual["update_task_ids_by_round"] != manifest["update_task_ids_by_round"]:
+        raise RuntimeError("GSM8K update task IDs do not reproduce the saved manifest")
+    if actual["validation_task_ids"] != manifest["validation_task_ids"]:
+        raise RuntimeError("GSM8K validation task IDs do not reproduce the saved manifest")
+    if any(actual["overlap_checks"].values()):
+        raise RuntimeError("saved GSM8K manifest contains overlapping task IDs")
     return data
 
 

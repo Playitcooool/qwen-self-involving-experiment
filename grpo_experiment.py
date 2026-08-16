@@ -22,11 +22,12 @@ def device_name():
 
 
 class GRPOPolicy:
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str, max_new_tokens: int = 64):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         self.device = device_name()
         base = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="auto", trust_remote_code=True).to(self.device)
         self.model = get_peft_model(base, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, target_modules=["q_proj", "v_proj"], task_type="CAUSAL_LM"))
+        self.max_new_tokens = int(max_new_tokens)
         self.model.train()
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-4)
 
@@ -34,7 +35,7 @@ class GRPOPolicy:
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         with torch.no_grad():
             out = self.model.generate(
-                **inputs, max_new_tokens=64, do_sample=True, temperature=temperature,
+                **inputs, max_new_tokens=self.max_new_tokens, do_sample=True, temperature=temperature,
                 top_p=0.95, num_return_sequences=group_size,
                 pad_token_id=self.tokenizer.eos_token_id,
             )
