@@ -1,0 +1,4 @@
+{
+  "adapter": "outputs/gsm8k_lopd/adapters/round_5",
+  "composer": "outputs/gsm8k_lopd/composer/composer.pt"
+}

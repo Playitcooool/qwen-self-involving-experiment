@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "Skill-based vs training-based self-involving improvement on Qwen3.5-0.8B"
+authors:
+  - family-names: Ruan
+    given-names: Weiciruan
+date-released: 2026-08-15
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/Playitcooool/qwen-self-involving-experiment"
+abstract: "Reproducible local-model experiment comparing external skill cards with offline LoRA self-improvement, explicitly excluding test-time training."

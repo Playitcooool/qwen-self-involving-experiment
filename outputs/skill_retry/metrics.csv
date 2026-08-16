@@ -1,0 +1,6 @@
+round,condition,accuracy,seconds
+1,skill_retry,0.175,95.72587490081787
+2,skill_retry,0.175,96.10219979286194
+3,skill_retry,0.175,96.7493588924408
+4,skill_retry,0.175,103.7526867389679
+5,skill_retry,0.175,112.85616683959961

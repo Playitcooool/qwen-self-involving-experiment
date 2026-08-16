@@ -2,6 +2,11 @@
 __pycache__/
 *.py[cod]
 .DS_Store
-outputs/adapters/
+outputs/**/adapters/
+outputs/**/adapter/
+outputs/**/trainer/
+outputs/**/composer/
+outputs/lopd_smoke/
+data_cache/
 models/
 data/generated/
