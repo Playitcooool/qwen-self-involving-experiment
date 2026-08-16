@@ -25,6 +25,21 @@ def gsm8k_answer(raw_answer: str) -> str:
     return match.group(0) if match else answer.rstrip(".!?")
 
 
+def gsm8k_solution(raw_answer: str) -> str:
+    """Return the official derivation followed by the final numeric answer.
+
+    The held-out evaluator accepts a reasoning trace, but requires the final
+    numeric value to be the last number.  Keeping the official derivation in
+    the SFT target therefore matches the task format without exposing the
+    answer as an answer-only completion.
+    """
+    if "####" not in raw_answer:
+        raise ValueError("GSM8K row has no #### final-answer delimiter")
+    rationale = raw_answer.rsplit("####", 1)[0].strip()
+    answer = gsm8k_answer(raw_answer)
+    return f"{rationale}\n{answer}" if rationale else answer
+
+
 def gsm8k_prompt(question: str) -> str:
     return (
         "Solve this grade-school math problem. Show concise reasoning, then write "

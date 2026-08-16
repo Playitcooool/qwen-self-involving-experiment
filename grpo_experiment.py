@@ -22,12 +22,18 @@ def device_name():
 
 
 class GRPOPolicy:
-    def __init__(self, model_path: str, max_new_tokens: int = 64):
+    def __init__(
+        self,
+        model_path: str,
+        max_new_tokens: int = 64,
+        reference_kl_weight: float = 0.05,
+    ):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         self.device = device_name()
         base = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="auto", trust_remote_code=True).to(self.device)
         self.model = get_peft_model(base, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, target_modules=["q_proj", "v_proj"], task_type="CAUSAL_LM"))
         self.max_new_tokens = int(max_new_tokens)
+        self.reference_kl_weight = float(reference_kl_weight)
         self.model.train()
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-4)
 
@@ -47,24 +53,49 @@ class GRPOPolicy:
         full = self.tokenizer(prompt + completion, return_tensors="pt").input_ids.to(self.device)
         p_len = prompt_ids.shape[1]
         logits = self.model(full).logits[:, :-1, :]
-        logp = torch.log_softmax(logits, dim=-1)
         target = full[:, 1:]
         start = max(p_len - 1, 0)
-        return logp[:, start:, :].gather(-1, target[:, start:].unsqueeze(-1)).squeeze(-1).sum()
+        student_logits = logits[:, start:, :]
+        target = target[:, start:]
+        student_logp = (
+            student_logits.gather(-1, target.unsqueeze(-1)).squeeze(-1)
+            - torch.logsumexp(student_logits, dim=-1)
+        )
+        with torch.no_grad():
+            with self.model.disable_adapter():
+                reference_logits = self.model(full).logits[:, :-1, :][:, start:, :]
+            reference_logp = (
+                reference_logits.gather(-1, target.unsqueeze(-1)).squeeze(-1)
+                - torch.logsumexp(reference_logits, dim=-1)
+            )
+        # This is the standard sampled estimator of KL(policy || reference):
+        # the sampled completion supplies the expectation over policy tokens.
+        reference_kl = (student_logp - reference_logp).mean()
+        return student_logp.sum(), reference_kl
 
     def update_task(self, task, group_size: int, temperature: float):
         completions = self.sample_group(task.prompt, group_size, temperature)
         rewards = torch.tensor([float(normalize(c, task.family) == normalize(task.answer, task.family)) for c in completions], device=self.device)
         advantages = rewards - rewards.mean()
         if float(advantages.abs().sum()) == 0.0:
-            return {"mean_reward": float(rewards.mean()), "updated": False}
-        logps = torch.stack([self.completion_logprob(task.prompt, c) for c in completions])
-        loss = -(advantages.detach() * logps).mean()
+            return {"mean_reward": float(rewards.mean()), "reference_kl": 0.0, "updated": False}
+        scored = [self.completion_logprob(task.prompt, c) for c in completions]
+        logps = torch.stack([item[0] for item in scored])
+        reference_kls = torch.stack([item[1] for item in scored])
+        loss = (
+            -(advantages.detach() * logps).mean()
+            + self.reference_kl_weight * reference_kls.mean()
+        )
         self.optimizer.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
         self.optimizer.step()
-        return {"mean_reward": float(rewards.mean()), "updated": True, "loss": float(loss.detach())}
+        return {
+            "mean_reward": float(rewards.mean()),
+            "reference_kl": float(reference_kls.mean().detach()),
+            "updated": True,
+            "loss": float(loss.detach()),
+        }
 
     def save(self, path: Path):
         path.mkdir(parents=True, exist_ok=True)

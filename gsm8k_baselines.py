@@ -17,7 +17,9 @@ from experiment import normalize
 from gsm8k_data import (
     GSM8KDataSplits,
     build_gsm8k_splits,
+    gsm8k_solution,
     load_gsm8k_splits_from_manifest,
+    load_gsm8k_rows,
     write_manifest,
 )
 from grpo_experiment import GRPOPolicy, device_name
@@ -26,12 +28,12 @@ from grpo_experiment import GRPOPolicy, device_name
 class GSM8KSFTDataset(torch.utils.data.Dataset):
     """Fixed-length prompt/answer examples with loss masked on the prompt."""
 
-    def __init__(self, tokenizer, tasks, max_length: int):
+    def __init__(self, tokenizer, tasks, max_length: int, targets: dict[str, str]):
         self.rows = []
         pad_id = tokenizer.pad_token_id
         for task in tasks:
             prompt_ids = tokenizer(task.prompt + "\n", add_special_tokens=True).input_ids
-            answer_ids = tokenizer(task.answer, add_special_tokens=False).input_ids
+            answer_ids = tokenizer(targets[task.task_id], add_special_tokens=False).input_ids
             if tokenizer.eos_token_id is not None:
                 answer_ids.append(int(tokenizer.eos_token_id))
             ids = (prompt_ids + answer_ids)[:max_length]
@@ -71,7 +73,12 @@ def train_sft(model_path: str, tasks, output: Path, args: argparse.Namespace) ->
             task_type="CAUSAL_LM",
         ),
     )
-    dataset = GSM8KSFTDataset(tokenizer, tasks, args.max_sequence_tokens)
+    rows = load_gsm8k_rows("train")
+    targets = {
+        task.task_id: gsm8k_solution(rows[int(task.task_id.rsplit(":", 1)[-1])]["answer"])
+        for task in tasks
+    }
+    dataset = GSM8KSFTDataset(tokenizer, tasks, args.max_sequence_tokens, targets)
     training_args = TrainingArguments(
         output_dir=str(output / "trainer"),
         per_device_train_batch_size=args.sft_batch_size,
@@ -96,7 +103,7 @@ def train_sft(model_path: str, tasks, output: Path, args: argparse.Namespace) ->
         "seconds": time.time() - started,
         "adapter": str(adapter),
         "uses_gold_labels": True,
-        "target": "final numeric answer only",
+        "target": "official GSM8K rationale followed by final numeric answer",
     }
     del trainer, model
     gc.collect()
@@ -107,15 +114,21 @@ def train_sft(model_path: str, tasks, output: Path, args: argparse.Namespace) ->
 
 def train_grpo(model_path: str, data: GSM8KDataSplits, output: Path, args: argparse.Namespace):
     started = time.time()
-    policy = GRPOPolicy(model_path, max_new_tokens=args.max_new_tokens)
+    policy = GRPOPolicy(
+        model_path,
+        max_new_tokens=args.max_new_tokens,
+        reference_kl_weight=args.reference_kl_weight,
+    )
     round_rows = []
     for round_no, tasks in enumerate(data.update_rounds, start=1):
         update_start = time.time()
         rewards = []
+        reference_kls = []
         updated = 0
         for task in tasks:
             result = policy.update_task(task, args.group_size, args.temperature)
             rewards.append(result["mean_reward"])
+            reference_kls.append(result.get("reference_kl", 0.0))
             updated += int(result["updated"])
         checkpoint = output / "adapters" / f"round_{round_no}"
         policy.save(checkpoint)
@@ -124,6 +137,7 @@ def train_grpo(model_path: str, data: GSM8KDataSplits, output: Path, args: argpa
                 "round": round_no,
                 "condition": "grpo_gsm8k",
                 "mean_train_reward": sum(rewards) / len(rewards),
+                "mean_reference_kl": sum(reference_kls) / len(reference_kls),
                 "updated_tasks": updated,
                 "seconds": time.time() - update_start,
                 "adapter": str(checkpoint),
@@ -164,6 +178,7 @@ def build_parser():
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--group-size", type=int, default=4)
+    parser.add_argument("--reference-kl-weight", type=float, default=0.05)
     parser.add_argument("--max-sequence-tokens", type=int, default=384)
     parser.add_argument("--sft-epochs", type=float, default=2.0)
     parser.add_argument("--sft-lr", type=float, default=2e-4)
@@ -200,8 +215,8 @@ def main() -> None:
     (out / "report.md").write_text(
         "# Domain-matched GSM8K baselines\n\n"
         f"- Update tasks: **{len(data.update_tasks)}**\n"
-        "- SFT uses the verified final numeric answers as direct labels.\n"
-        "- GRPO uses group-relative verifier rewards and no answer-token labels.\n\n"
+        "- SFT uses the official GSM8K rationale followed by the final numeric answer as the target.\n"
+        "- GRPO uses group-relative verifier rewards, with a small sampled reference-retention penalty.\n\n"
         f"- SFT adapter: `{sft['adapter']}`\n"
         f"- GRPO adapter: `{grpo['adapter']}`\n"
     )

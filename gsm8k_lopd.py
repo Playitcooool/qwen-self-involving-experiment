@@ -17,12 +17,13 @@ import csv
 import gc
 import json
 import random
+import shutil
 import time
 from pathlib import Path
 
 import torch
 
-from gsm8k_data import build_gsm8k_splits, write_manifest
+from gsm8k_data import build_gsm8k_splits, load_gsm8k_splits_from_manifest, write_manifest
 from lopd_lite import LOPDTrainer, device_name, git_revision
 from experiment import normalize
 
@@ -31,6 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", required=True)
     parser.add_argument("--output", default="outputs/gsm8k_lopd")
+    parser.add_argument("--data-manifest", default="")
     parser.add_argument("--rounds", type=int, default=5)
     parser.add_argument("--bank-tasks", type=int, default=64)
     parser.add_argument("--tasks-per-round", type=int, default=8)
@@ -53,6 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--margin", type=float, default=0.02)
     parser.add_argument("--dual-step", type=float, default=0.5)
     parser.add_argument("--anchor-weight", type=float, default=0.1)
+    parser.add_argument("--reference-kl-weight", type=float, default=0.1)
     parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--max-grad-norm", type=float, default=1.0)
     parser.add_argument("--lora-rank", type=int, default=8)
@@ -75,13 +78,17 @@ def main() -> None:
     torch.manual_seed(args.seed)
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
-    data = build_gsm8k_splits(
-        bank_tasks=args.bank_tasks,
-        rounds=args.rounds,
-        tasks_per_round=args.tasks_per_round,
-        validation_tasks=args.validation_tasks,
-        seed=args.seed,
-    )
+    manifest_path = Path(args.data_manifest) if args.data_manifest else None
+    if manifest_path and manifest_path.exists():
+        data = load_gsm8k_splits_from_manifest(manifest_path)
+    else:
+        data = build_gsm8k_splits(
+            bank_tasks=args.bank_tasks,
+            rounds=args.rounds,
+            tasks_per_round=args.tasks_per_round,
+            validation_tasks=args.validation_tasks,
+            seed=args.seed,
+        )
     write_manifest(data, out / "data_manifest.json")
     (out / "config.json").write_text(
         json.dumps(
@@ -115,6 +122,9 @@ def main() -> None:
 
     log_rows: list[dict[str, object]] = []
     round_rows: list[dict[str, object]] = []
+    validation_rows: list[dict[str, object]] = []
+    best_round: int | None = None
+    best_validation_accuracy = -1.0
     for round_no, round_tasks in enumerate(data.update_rounds, start=1):
         rewards: list[float] = []
         update_start = time.time()
@@ -148,12 +158,58 @@ def main() -> None:
         adapter.mkdir(parents=True, exist_ok=True)
         trainer.model.save_pretrained(adapter)
         trainer.tokenizer.save_pretrained(adapter)
+        validation_hits = 0
+        for task in data.validation:
+            prediction = trainer.generate(task.prompt, sample=False)
+            correct = normalize(prediction, task.family) == normalize(task.answer, task.family)
+            validation_hits += int(correct)
+            validation_rows.append(
+                {
+                    "round": round_no,
+                    "task_id": task.task_id,
+                    "prediction": prediction,
+                    "correct": correct,
+                }
+            )
+        validation_accuracy = validation_hits / len(data.validation) if data.validation else 0.0
+        round_rows[-1]["validation_accuracy"] = validation_accuracy
+        if validation_accuracy > best_validation_accuracy:
+            best_validation_accuracy = validation_accuracy
+            best_round = round_no
+
+    if best_round is None:
+        if not data.update_rounds:
+            raise RuntimeError("cannot select a LOPD checkpoint without training rounds")
+        best_round = len(data.update_rounds)
+        best_validation_accuracy = 0.0
 
     write_metrics(out / "metrics.csv", round_rows)
     with (out / "training_log.jsonl").open("w") as handle:
         for row in log_rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    with (out / "validation_predictions.jsonl").open("w") as handle:
+        for row in validation_rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     final_adapter = trainer.save(out, args)
+    best_adapter = out / "adapters" / "best"
+    shutil.copytree(
+        out / "adapters" / f"round_{best_round}",
+        best_adapter,
+        dirs_exist_ok=True,
+    )
+    (out / "final_checkpoint.json").write_text(
+        json.dumps(
+            {
+                "adapter": str(best_adapter),
+                "final_adapter": str(final_adapter),
+                "selected_round": best_round,
+                "validation_accuracy": best_validation_accuracy,
+                "composer": str(out / "composer" / "composer.pt"),
+            },
+            indent=2,
+        )
+        + "\n"
+    )
     (out / "report.md").write_text(
         "# Domain-matched GSM8K LOPD-lite experiment\n\n"
         f"- Successful base-model experiences: **{len(bank)}**\n"
@@ -161,9 +217,10 @@ def main() -> None:
         f"- GSM8K validation-only tasks: **{len(data.validation)}**\n"
         f"- Latent tokens: **{args.latent_tokens}**; retrieved experiences: **{args.retrieve_top_k}**\n"
         f"- Final student adapter: `{final_adapter}`\n"
+        f"- Selected adapter: `{best_adapter}` (round **{best_round}**, validation accuracy **{best_validation_accuracy:.3f}**)\n"
         f"- Total training wall time: **{time.time() - started:.1f}s**\n\n"
         + "\n".join(
-            f"- Round {row['round']}: mean verifier reward **{row['mean_train_reward']:.3f}**"
+            f"- Round {row['round']}: mean verifier reward **{row['mean_train_reward']:.3f}**, validation accuracy **{row['validation_accuracy']:.3f}**"
             for row in round_rows
         )
         + "\n\n"
