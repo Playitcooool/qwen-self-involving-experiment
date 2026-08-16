@@ -1,0 +1,7 @@
+{
+  "adapter": "outputs/gsm8k_lopd_fixed/adapters/best",
+  "final_adapter": "outputs/gsm8k_lopd_fixed/adapters/round_5",
+  "selected_round": 1,
+  "validation_accuracy": 0.03125,
+  "composer": "outputs/gsm8k_lopd_fixed/composer/composer.pt"
+}
