@@ -1,0 +1,6 @@
+condition,accuracy
+baseline,0.15
+sft_round_5,0.325
+grpo_round_5,0.3
+skill_retry,0.175
+lopd_lite,0.25

@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 .DS_Store
 outputs/**/adapters/
+outputs/**/composer/
+outputs/lopd_smoke/
 data_cache/
 models/
 data/generated/
