@@ -43,6 +43,39 @@ The multi-type held-out suite in `outputs/benchmark_suite/` covers word-problem 
 
 The real-data subset evaluation in `outputs/real_benchmark/` uses public [GSM8K](https://huggingface.co/datasets/openai/gsm8k), [HumanEval](https://huggingface.co/datasets/openai/openai_humaneval), and [ARC-Challenge](https://huggingface.co/datasets/allenai/ai2_arc) test data. Results are reported as a fixed subset evaluation, not official full-set scores: baseline 0.486, SFT 0.429, GRPO 0.457, external skill 0.243, and LOPD-lite 0.343 overall. LOPD-lite, SFT, and GRPO were trained on the earlier synthetic distribution, so these are transfer results rather than domain-matched training results.
 
+## Domain-matched GSM8K run
+
+The completed real-data run in `outputs/gsm8k_lopd/`, `outputs/gsm8k_domain/`, and `outputs/real_benchmark_gsm8k/` uses the official GSM8K `main/train` split (7,473 rows) for training. The split is leakage-safe: 64 problems are reserved for successful experience-bank collection, 40 disjoint problems are used for five on-policy update rounds, and 32 disjoint problems are validation-only. The existing 70-task held-out manifest—30 GSM8K, 10 HumanEval, and 30 ARC-Challenge tasks—is never loaded by the training scripts.
+
+The run was executed with:
+
+```bash
+uv run python gsm8k_lopd.py \
+  --model-path /Volumes/Samsung/lmstudio/lmstudio-community/Qwen:Qwen3.5-0.8B \
+  --output outputs/gsm8k_lopd \
+  --rounds 5 --bank-tasks 64 --tasks-per-round 8 \
+  --validation-tasks 32 --bank-rollouts-per-task 3 \
+  --max-new-tokens 256 --seed 20260816
+
+uv run python gsm8k_baselines.py \
+  --model-path /Volumes/Samsung/lmstudio/lmstudio-community/Qwen:Qwen3.5-0.8B \
+  --data-manifest outputs/gsm8k_lopd/data_manifest.json \
+  --output outputs/gsm8k_domain --rounds 5 \
+  --tasks-per-round 8 --max-new-tokens 256 --seed 20260816
+```
+
+Only 12 of the 64 bank tasks produced successful base-model trajectories. The final student was evaluated without retrieval or latent context. On the same fixed held-out subset:
+
+| Condition | Overall | GSM8K | HumanEval | ARC-Challenge |
+|---|---:|---:|---:|---:|
+| Base | 0.486 | 0.367 | 0.000 | 0.767 |
+| Static skill | 0.243 | 0.100 | 0.100 | 0.433 |
+| Domain SFT | 0.400 | 0.233 | 0.000 | 0.700 |
+| Domain GRPO | 0.414 | 0.300 | 0.000 | 0.667 |
+| Domain LOPD-lite | 0.400 | **0.333** | 0.000 | 0.600 |
+
+The important domain-matched comparison is GSM8K: LOPD-lite beat matched GRPO (0.333 vs. 0.300) and SFT (0.333 vs. 0.233), but did not beat the frozen base model (0.333 vs. 0.367). The overall score is not a pure math score because HumanEval and ARC are transfer checks. This is evidence that the method can use real successful math trajectories, not evidence that LOPD-lite is always better; the small bank and falling on-policy reward make this a pilot result. The implementation remains the lightweight LOPD-lite variant, not an exact reproduction of the paper's unreleased full QFormer training code.
+
 ## Design
 
 The benchmark has four exact-match task families: arithmetic, list filtering, string transformation, and constraint-following JSON. Each round uses fresh exploration tasks. Both improvement conditions see the same failed attempts, verifier feedback, and self-analysis prompt; only the storage mechanism differs.

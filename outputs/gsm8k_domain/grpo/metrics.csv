@@ -1,0 +1,6 @@
+adapter,condition,mean_train_reward,round,seconds,updated_tasks
+outputs/gsm8k_domain/grpo/adapters/round_1,grpo_gsm8k,0.34375,1,386.08962416648865,7
+outputs/gsm8k_domain/grpo/adapters/round_2,grpo_gsm8k,0.15625,2,352.7489240169525,2
+outputs/gsm8k_domain/grpo/adapters/round_3,grpo_gsm8k,0.21875,3,363.9316658973694,4
+outputs/gsm8k_domain/grpo/adapters/round_4,grpo_gsm8k,0.0,4,333.8174641132355,0
+outputs/gsm8k_domain/grpo/adapters/round_5,grpo_gsm8k,0.21875,5,373.5469927787781,5

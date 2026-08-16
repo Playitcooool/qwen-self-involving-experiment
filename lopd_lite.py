@@ -10,9 +10,10 @@ checkpoint.  It keeps the paper's important asymmetry:
 * only the LoRA student is kept for inference.
 
 The implementation uses a lightweight learned-query composer over frozen input
-embeddings instead of the paper's full QFormer encoder.  The experience bank is
-constructed only from successful base-model rollouts on synthetic training
-tasks, and it never stores the reference answer as a model input.
+embeddings instead of the paper's full QFormer encoder.  The driver constructs
+the experience bank from successful base-model rollouts on its training tasks
+(synthetic or domain-matched real data), and it never stores the reference answer
+as a model input.
 """
 from __future__ import annotations
 
