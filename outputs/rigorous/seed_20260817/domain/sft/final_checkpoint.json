@@ -1,0 +1,12 @@
+{
+  "condition": "gold_sft_reference",
+  "tasks": 40,
+  "epochs": 2.0,
+  "seconds": 1031.472459077835,
+  "adapter": "outputs/rigorous/seed_20260817/domain/sft/adapter",
+  "final_adapter": "outputs/rigorous/seed_20260817/domain/sft/final_adapter",
+  "selected_checkpoint": 1,
+  "validation_accuracy": 0.3125,
+  "uses_gold_labels": true,
+  "target": "official GSM8K rationale followed by final numeric answer"
+}

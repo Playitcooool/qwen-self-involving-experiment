@@ -1,0 +1,7 @@
+adapter,condition,mean_reference_kl,mean_train_reward,round,seconds,updated_tasks,validation_accuracy
+,grpo_verifier,,,0,,0,0.0
+outputs/rigorous/seed_20260817/domain/grpo/adapters/round_1,grpo_verifier,0.00045299530029296875,0.15625,1,618.3724820613861,4,0.03125
+outputs/rigorous/seed_20260817/domain/grpo/adapters/round_2,grpo_verifier,0.0016341209411621094,0.125,2,738.0501937866211,4,0.03125
+outputs/rigorous/seed_20260817/domain/grpo/adapters/round_3,grpo_verifier,0.0035419464111328125,0.09375,3,721.2754266262054,3,0.09375
+outputs/rigorous/seed_20260817/domain/grpo/adapters/round_4,grpo_verifier,0.0003833770751953125,0.03125,4,679.6751880645752,1,0.125
+outputs/rigorous/seed_20260817/domain/grpo/adapters/round_5,grpo_verifier,0.004608154296875,0.09375,5,756.1169092655182,3,0.21875

@@ -1,0 +1,7 @@
+bank_size,beta,condition,mean_train_reward,round,seconds,updated_tasks,validation_accuracy
+15,0.0,lopd_lite_gsm8k,,0,,0,0.0
+15,0.0,lopd_lite_gsm8k,0.0,1,102.24773406982422,,0.0
+15,0.020881660846062005,lopd_lite_gsm8k,0.25,2,86.27979898452759,,0.0
+15,0.020881660846062005,lopd_lite_gsm8k,0.0,3,84.19834423065186,,0.0
+15,0.020881660846062005,lopd_lite_gsm8k,0.0,4,83.10059809684753,,0.0
+15,0.020881660846062005,lopd_lite_gsm8k,0.0,5,86.44934606552124,,0.0

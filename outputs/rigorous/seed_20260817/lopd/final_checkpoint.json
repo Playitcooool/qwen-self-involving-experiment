@@ -1,0 +1,7 @@
+{
+  "adapter": null,
+  "final_adapter": "outputs/rigorous/seed_20260817/lopd/adapters/round_5",
+  "selected_round": 0,
+  "validation_accuracy": 0.0,
+  "composer": "outputs/rigorous/seed_20260817/lopd/composer/composer.pt"
+}
