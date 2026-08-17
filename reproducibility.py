@@ -23,7 +23,16 @@ def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
 
 
 def content_sha256(value: object) -> str:
-    payload = json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    def canonical(item: object):
+        if hasattr(item, "tolist"):
+            return item.tolist()
+        if hasattr(item, "item"):
+            return item.item()
+        if isinstance(item, Path):
+            return str(item)
+        raise TypeError(f"cannot canonically serialize {type(item).__name__}")
+
+    payload = json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), default=canonical)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
