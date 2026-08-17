@@ -1,0 +1,140 @@
+{
+  "method": "base-model summary of verified-successful train rollouts",
+  "cards": [
+    {
+      "source_task_id": "gsm8k:train:584",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nRobin likes to bake cupcakes for friends and to make her puppy North happy. Once Robin ate four cupcakes with chocolate sauce and twice as many cupcakes with buttercream frosting on her own. How many cupcakes did Robin eat?",
+      "source_trajectory_sha256": "953af60a6b5d7f05cb00d71e12b42f645b03de4f334e2417e8fa07da5e92eb84",
+      "procedure": "<number>. Buttercream cupcakes = <number> * <number>. **Calculate the total number of cupcakes**: Total cupcakes = Chocolate cupcakes + Buttercream cupcakes = <number> + <number> * <number>. **Solve for the number of chocolate cupcakes**: Total cupcakes = <number> + <number> * <number>. <number>. **Solve for the number of chocolate cupcakes**: Total cupcakes = <number> + <number> * <number>. <number>. **Solve for the number of chocolate cupcakes**: Total cupcakes = <number> + <number> * <number>. <number>. **Solve for the number of chocolate cupcakes",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:584",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nRobin likes to bake cupcakes for friends and to make her puppy North happy. Once Robin ate four cupcakes with chocolate sauce and twice as many cupcakes with buttercream frosting on her own. How many cupcakes did Robin eat?",
+      "source_trajectory_sha256": "5e6ad9ab10571a19c612a151e250d304eae8c8f13622e71763c2f9250832af20",
+      "procedure": "<number>. The final answer is <number>. **Final Answer:** <number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:6100",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nGrandma Olga has 3 daughters and 3 sons.  If all her daughters each have 6 sons, and each of her sons has 5 daughters, how many grandchildren does she have in total?",
+      "source_trajectory_sha256": "7e5a99b98727f4e8422cdec6e82b7e2411596fa582a4e0e30139a2b26e9bd7bd",
+      "procedure": "<number>$$ <number>. **Count the Grandchildren**: The total number of grandchildren is the sum of the daughters' sons and the sons' daughters. $$<number> \\text{ daughters' sons} + <number> \\text{ sons' daughters} = <number>$$ Final Answer: <number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:5398",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nJohn weighs 220 pounds when he starts exercising.  He manages to lose 10% of his body weight.  He then gains back 2 pounds.  How much does he weigh at the end?",
+      "source_trajectory_sha256": "dac5cc624df2a600ab4b774949944c28fcb5f3758e8cf168dccfacf277a8d6d0",
+      "procedure": "> \\times <n>$. Then, he gains back <number> pounds. The final weight is $<number> - <number> \\times <n> \\times <n> + <number>$. John weighs <number> pounds when he starts exercising. He manages to lose <number>% of his body weight. He then gains back <number> pounds. How much does he weigh at the end? John weighs <number> pounds when he starts exercising. He manages to lose <number>% of his body weight. He then gains back <number> pounds. How much does he weigh at the end?",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:4584",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nKeith and Blaine went fishing. Blaine caught 5 fish while Keith caught twice as many as Blaine's. How many fish did they catch together?",
+      "source_trajectory_sha256": "c90bf658ceb35c78f0631c6d00a5fce67997b75503ccb45604a42b41acd4c56c",
+      "procedure": "<number> fish. **Solving Procedure:** <number>. **Identify the relationship:** Blaine caught $x$ fish, and Keith caught $<number>x$ fish. <number>. **Calculate the total:** The total number of fish caught is the sum of Blaine's and Keith's catches. <number>. **Formulate the equation:** $x + <number>x = <number>$ fish. <number>. **Solve for the total:** $<number>x = <number>$ fish. <number>. **Determine the value:** Since the problem asks for the total number of fish,",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:1223",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nSteven, Stephanie, and Sonya went ice skating. Steven only fell down 3 times, but Stephanie had 13 more falls than Steven. If Sonya fell down 2 times less than half the number of times Stephanie fell, how many times did Sonya fall?",
+      "source_trajectory_sha256": "d8205114b8b5d13b87842285fcad867351f45225798dc93c900dc8623cc8205a",
+      "procedure": "<number>.marginTop = <number> <number>. Sonya falls = <number> - <number> = <number> <number>. Final Numeric Answer: <number> <number>.marginTop = <number> <number>. Sonya falls = <number> - <number> = <number> <number>. Final Numeric Answer: <number> <number>.marginTop = <number> <number>. Sonya falls = <number> - <number> = <number> <number>. Final Numeric Answer: <number> <number>.marginTop = <number> <number>. Sonya falls = <number> - <",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:1223",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nSteven, Stephanie, and Sonya went ice skating. Steven only fell down 3 times, but Stephanie had 13 more falls than Steven. If Sonya fell down 2 times less than half the number of times Stephanie fell, how many times did Sonya fall?",
+      "source_trajectory_sha256": "b587906c02c1066819bdf0bcac22b5e009ba9f9affb55d8b7628d4fa414630f1",
+      "procedure": "times less than half the number of times Stephanie fell. $$Sonya\\_falls = \\frac{<number>}{<number>} \\times Stephanie\\_falls - <number>$$ $$Sonya\\_falls = \\frac{<number>}{<number>} \\times <number> - <number> = <number>$$ **Final Answer:** The number of times Sonya fell is <number>. **Final Answer:** <number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:126",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nJohn has five more roommates than twice as many as Bob. If Bob has 10 roommates, how many roommates does John have?",
+      "source_trajectory_sha256": "667242d8bfceee19dd7a5331ec3e4bdb862da2fc268d64842d3627001705d5bc",
+      "procedure": "The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{E}. The final answer is \\boxed{",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:126",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nJohn has five more roommates than twice as many as Bob. If Bob has 10 roommates, how many roommates does John have?",
+      "source_trajectory_sha256": "ce3b1cd100c3e7f40f5bd9d45fce51088628187696d51a0a5df9c1e7ac3a1dd2",
+      "procedure": "more than that = $<number> + <number> = <number>$. <number> more than that = $<number> + <number> = <number>$. <number> more than that = $<number> + <number> = <number>$. <number> more than that = $<number> + <number> = <number>$. <number> more than that = $<number> + <number> = <number>$. <number> more than that = $<number> + <number> = <number>$. <number> more than that = $<number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:7253",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nIn Rodrigo's classroom in the morning there are red chairs, yellow chairs, and blue chairs. There are 4 red chairs. There are 2 times as many yellow chairs as red chairs, and there are 2 fewer blue chairs than yellow chairs. In the afternoon, Lisa borrows 3 chairs.  How many chairs are left in Rodrigo's classroom?",
+      "source_trajectory_sha256": "37c0fb229ee4ac288d324645f1ffc6a1370e93ebf77b5eb77f7108fe52116a47",
+      "procedure": "Final answer: <number> chairs. **Final Answer:** <number> chairs. **Step <number>: Calculate the number of chairs in the morning.** * Red chairs: <number> * Yellow chairs: $<number> \\times <number> = <number>$ * Blue chairs: $<number> - <number> = <number>$ * Total chairs before borrowing: $<number> + <number> + <number> = <number>$ **Step <number>: Calculate the number of chairs in the afternoon.** * Lisa borrows <number> chairs. * Remaining chairs: $<number> - <",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:3210",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nAnna has a certain number of phone chargers and five times more laptop chargers than phone chargers. If she has 24 chargers total, how many phone chargers does she have?",
+      "source_trajectory_sha256": "e020d6df64e3a5483919314bbd738f9b4a5b0637c42016b66f7cadda0a8a002f",
+      "procedure": ". </think> To solve this problem, let $x$ be the number of phone chargers. Since Anna has $x$ times more laptop chargers than phone chargers, the number of laptop chargers is $x^<number>$. The total number of chargers is $x + x^<number>$. Given that the total is <number> we solve the equation $x + x^<number> = <number>$ to find $x$. The solution is $x = <number>$. Therefore, Anna has <number> phone chargers. <number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:2074",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nSamanta is planning a party for her friend Marta. She decided to raise some money among the guests she invited, to buy Marta a gift. Every participant gave Samanta $5 for this purpose and she herself put in $10. The gift cost was lower than expected, so there was $15 leftover. What was the price of the gift, if there were 12 guests invited?",
+      "source_trajectory_sha256": "a9fac8f150eee3db61e60bc8dc940de9ba9fbe95901748926bc148049a7cdd81",
+      "procedure": "ing the gift was $\\$<number>$. * The cost of the gift = $\\$<number> - \\$<number> = \\$<number>$. **Step <number>: Calculate the price of the gift.** * The price of the gift = $\\$<number>$. Answer: $<number>",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:2074",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nSamanta is planning a party for her friend Marta. She decided to raise some money among the guests she invited, to buy Marta a gift. Every participant gave Samanta $5 for this purpose and she herself put in $10. The gift cost was lower than expected, so there was $15 leftover. What was the price of the gift, if there were 12 guests invited?",
+      "source_trajectory_sha256": "68ab76e58aadb58a4134213c8d18dd9451985f455302a76c5a90f5aaeb13859e",
+      "procedure": "<number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <number> + <number> \\times <number> = <",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:738",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nTom Sawyer has tricked his friends into whitewashing Aunt Polly's 100-foot fence. His first friend, Ben, whitewashed 10 feet. His second friend Billy whitewashed a fifth of the remaining fence. A third friend, Johnny, whitewashed a third of the fence that was left after that. How much of the fence still needs to be whitewashed?",
+      "source_trajectory_sha256": "22709916a4e7269b13ac40b6e22b2f3095648560849f1f1ba4d1568d0fb9ac37",
+      "procedure": "* fence. * Fraction: $\\frac{<number>}{<number>}$ * Calculation: $<number> \\div <number> = <number>$ feet. * Remaining: $<number> - <number> = <number>$ feet. **Final Answer**: The amount of fence left after all friends' contributions is <number> feet. **Final Answer**: <number> feet. **Final Answer**: <number> feet. **Final Answer**: <number> feet. **Final Answer**: <number> feet. **Final Answer**: <number> feet. **Final Answer**: <",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    },
+    {
+      "source_task_id": "gsm8k:train:1431",
+      "source_prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\nTony is driving his car between his town and a friend's down. The towns are 120 miles apart and he gets there in 3 hours. The next day, he is driving to see another friend who lives 200 miles away from his friend. If he drives at the same speed, how long will the drive take?",
+      "source_trajectory_sha256": "2d8e23b577b61f4560b377481e5700907de50e2c95516c67c6a6b0ee518877fa",
+      "procedure": "friend lives <number> miles away from Tony. * **Speed:** Tony's speed is **<number> mph**. * **Time Formula:** Time = Distance / Speed * **Calculation:** $<number> \\text{ miles} / <number> \\text{ mph} = <number> \\text{ hours}$. So, the second trip will take **<number> hours**. **Final Answer:** The total time for the second trip is **<number> hours**. **Step <number>: Calculate Tony's speed on the first trip.** * **Distance:** The towns are <number> miles apart. * **",
+      "uses_reference_answer": false,
+      "final_trajectory_line_removed_before_summary": true,
+      "quantities_redacted_before_and_after_summary": true
+    }
+  ]
+}

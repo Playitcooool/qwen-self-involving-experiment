@@ -22,17 +22,30 @@ def device_name():
 
 
 class GRPOPolicy:
-    def __init__(self, model_path: str, max_new_tokens: int = 64):
+    def __init__(
+        self,
+        model_path: str,
+        max_new_tokens: int = 64,
+        reference_kl_weight: float = 0.05,
+        clip_epsilon: float = 0.2,
+        update_epochs: int = 2,
+    ):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         self.device = device_name()
         base = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype="auto", trust_remote_code=True).to(self.device)
         self.model = get_peft_model(base, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, target_modules=["q_proj", "v_proj"], task_type="CAUSAL_LM"))
         self.max_new_tokens = int(max_new_tokens)
-        self.model.train()
+        self.reference_kl_weight = float(reference_kl_weight)
+        self.clip_epsilon = float(clip_epsilon)
+        self.update_epochs = int(update_epochs)
+        # Keep dropout disabled for both rollout and scoring. Gradients still
+        # flow in eval mode, and every likelihood then refers to one policy.
+        self.model.eval()
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-4)
 
     def sample_group(self, prompt: str, group_size: int, temperature: float):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        inputs = self.tokenizer(prompt.rstrip() + "\n", return_tensors="pt").to(self.device)
+        self.model.eval()
         with torch.no_grad():
             out = self.model.generate(
                 **inputs, max_new_tokens=self.max_new_tokens, do_sample=True, temperature=temperature,
@@ -40,31 +53,96 @@ class GRPOPolicy:
                 pad_token_id=self.tokenizer.eos_token_id,
             )
         p_len = inputs.input_ids.shape[1]
-        return [self.tokenizer.decode(seq[p_len:], skip_special_tokens=True).strip() for seq in out]
+        samples = []
+        for sequence in out:
+            ids = sequence[p_len:].tolist()
+            if self.tokenizer.eos_token_id in ids:
+                ids = ids[: ids.index(self.tokenizer.eos_token_id) + 1]
+            while ids and ids[-1] == self.tokenizer.pad_token_id:
+                ids.pop()
+            if not ids:
+                ids = [int(self.tokenizer.eos_token_id)]
+            samples.append({
+                "token_ids": ids,
+                "text": self.tokenizer.decode(ids, skip_special_tokens=True).strip(),
+            })
+        return inputs.input_ids[0].tolist(), samples
 
-    def completion_logprob(self, prompt: str, completion: str):
-        prompt_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(self.device)
-        full = self.tokenizer(prompt + completion, return_tensors="pt").input_ids.to(self.device)
-        p_len = prompt_ids.shape[1]
+    def generate_greedy(self, prompt: str) -> str:
+        inputs = self.tokenizer(prompt.rstrip() + "\n", return_tensors="pt").to(self.device)
+        self.model.eval()
+        with torch.inference_mode():
+            output = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                do_sample=False,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+        return self.tokenizer.decode(output[0, inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
+
+    def completion_logprobs(self, prompt_ids: list[int], completion_ids: list[int]):
+        """Score the exact generated tokens without decode/re-tokenize drift."""
+        full = torch.tensor([prompt_ids + completion_ids], dtype=torch.long, device=self.device)
+        p_len = len(prompt_ids)
+        self.model.eval()
         logits = self.model(full).logits[:, :-1, :]
-        logp = torch.log_softmax(logits, dim=-1)
         target = full[:, 1:]
         start = max(p_len - 1, 0)
-        return logp[:, start:, :].gather(-1, target[:, start:].unsqueeze(-1)).squeeze(-1).sum()
+        student_logits = logits[:, start:, :]
+        target = target[:, start:]
+        student_logp = (
+            student_logits.gather(-1, target.unsqueeze(-1)).squeeze(-1)
+            - torch.logsumexp(student_logits, dim=-1)
+        )
+        with torch.no_grad(), self.model.disable_adapter():
+            reference_logits = self.model(full).logits[:, :-1, :][:, start:, :]
+            reference_logp = (
+                reference_logits.gather(-1, target.unsqueeze(-1)).squeeze(-1)
+                - torch.logsumexp(reference_logits, dim=-1)
+            )
+        # Non-negative per-token k3 estimator. Under policy samples its
+        # expectation estimates KL(policy || reference).
+        log_ratio_inverse = reference_logp - student_logp
+        reference_kl = torch.exp(log_ratio_inverse) - log_ratio_inverse - 1.0
+        return student_logp.squeeze(0), reference_kl.squeeze(0)
 
     def update_task(self, task, group_size: int, temperature: float):
-        completions = self.sample_group(task.prompt, group_size, temperature)
-        rewards = torch.tensor([float(normalize(c, task.family) == normalize(task.answer, task.family)) for c in completions], device=self.device)
+        prompt_ids, samples = self.sample_group(task.prompt, group_size, temperature)
+        rewards = torch.tensor([float(normalize(sample["text"], task.family) == normalize(task.answer, task.family)) for sample in samples], device=self.device)
         advantages = rewards - rewards.mean()
+        if float(advantages.std(unbiased=False)) > 0:
+            advantages = advantages / (advantages.std(unbiased=False) + 1e-8)
         if float(advantages.abs().sum()) == 0.0:
-            return {"mean_reward": float(rewards.mean()), "updated": False}
-        logps = torch.stack([self.completion_logprob(task.prompt, c) for c in completions])
-        loss = -(advantages.detach() * logps).mean()
-        self.optimizer.zero_grad(set_to_none=True)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-        self.optimizer.step()
-        return {"mean_reward": float(rewards.mean()), "updated": True, "loss": float(loss.detach())}
+            return {"mean_reward": float(rewards.mean()), "reference_kl": 0.0, "updated": False, "completions": samples}
+        with torch.no_grad():
+            old_logps = [self.completion_logprobs(prompt_ids, sample["token_ids"])[0].detach() for sample in samples]
+        losses = []
+        mean_kls = []
+        for _ in range(self.update_epochs):
+            objectives = []
+            kls = []
+            for advantage, old_logp, sample in zip(advantages, old_logps, samples):
+                current_logp, reference_kl = self.completion_logprobs(prompt_ids, sample["token_ids"])
+                ratio = torch.exp((current_logp - old_logp).clamp(-20.0, 20.0))
+                clipped = ratio.clamp(1.0 - self.clip_epsilon, 1.0 + self.clip_epsilon)
+                objectives.append(-torch.minimum(ratio * advantage.detach(), clipped * advantage.detach()).mean())
+                kls.append(reference_kl.mean())
+            policy_loss = torch.stack(objectives).mean()
+            reference_kl = torch.stack(kls).mean()
+            loss = policy_loss + self.reference_kl_weight * reference_kl
+            self.optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            self.optimizer.step()
+            losses.append(float(loss.detach()))
+            mean_kls.append(float(reference_kl.detach()))
+        return {
+            "mean_reward": float(rewards.mean()),
+            "reference_kl": sum(mean_kls) / len(mean_kls),
+            "updated": True,
+            "loss": sum(losses) / len(losses),
+            "completions": samples,
+        }
 
     def save(self, path: Path):
         path.mkdir(parents=True, exist_ok=True)

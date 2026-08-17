@@ -1,0 +1,12 @@
+{
+  "condition": "grpo_verifier",
+  "tasks": 40,
+  "rounds": 5,
+  "seconds": 3828.595256090164,
+  "adapter": "outputs/rigorous/seed_20260817/domain/grpo/adapter",
+  "final_adapter": "outputs/rigorous/seed_20260817/domain/grpo/final_adapter",
+  "selected_round": 5,
+  "validation_accuracy": 0.21875,
+  "uses_gold_labels": false,
+  "reward": "group-relative exact GSM8K verifier reward"
+}

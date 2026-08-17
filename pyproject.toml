@@ -1,7 +1,19 @@
 [project]
 name = "qwen-self-involving-experiment"
 version = "0.1.0"
-description = "Add your description here"
+description = "Reproducible skill-vs-offline-training experiments for a local Qwen model"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "accelerate==1.14.0",
+    "numpy==2.4.6",
+    "pandas==3.0.5",
+    "peft==0.20.0",
+    "pyarrow==25.0.1",
+    "safetensors==0.8.0",
+    "torch==2.13.0",
+    "transformers==5.15.0",
+]
+
+[dependency-groups]
+dev = ["pytest==9.0.2"]

@@ -35,7 +35,7 @@ def main() -> None:
     parser.add_argument("--output", default="outputs/real_benchmark_gsm8k")
     parser.add_argument("--sft-adapter", default="outputs/gsm8k_domain/sft/adapter")
     parser.add_argument("--grpo-adapter", default="outputs/gsm8k_domain/grpo/adapter")
-    parser.add_argument("--lopd-adapter", default="outputs/gsm8k_lopd/adapters/round_5")
+    parser.add_argument("--lopd-adapter", default="outputs/gsm8k_lopd/adapters/best")
     args = parser.parse_args()
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)

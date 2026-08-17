@@ -7,49 +7,60 @@ from pathlib import Path
 import torch
 import pandas as pd
 from experiment import Runner
+from reproducibility import content_sha256
 
 
 DATA_CACHE = Path("data_cache")
+DATASET_REVISIONS = {
+    "openai/gsm8k": "740312add88f781978c0658806c59bc2815b9866",
+    "allenai/ai2_arc": "210d026faf9955653af8916fad021475a3f00453",
+    "openai/openai_humaneval": "7dce6050a7d6d172f3cc5c32aa97f52fa1a2e544",
+}
 
 
 def load_parquet(repo: str, path: str):
     DATA_CACHE.mkdir(exist_ok=True)
     local = DATA_CACHE / (repo.replace("/", "__") + "__" + path.replace("/", "__"))
     if not local.exists():
-        url = f"https://huggingface.co/datasets/{repo}/resolve/main/{path}?download=true"
+        revision = DATASET_REVISIONS[repo]
+        url = f"https://huggingface.co/datasets/{repo}/resolve/{revision}/{path}?download=true"
         urllib.request.urlretrieve(url, local)
     return pd.read_parquet(local).to_dict(orient="records")
 
 
-def sample_rows(ds, n: int, seed: int):
-    ids = list(range(len(ds))); random.Random(seed).shuffle(ids)
-    return [ds[i] for i in ids[:n]]
+def sample_rows(ds, n: int, seed: int, excluded_indices: set[int] | None = None):
+    excluded_indices = excluded_indices or set()
+    ids = [index for index in range(len(ds)) if index not in excluded_indices]
+    random.Random(seed).shuffle(ids)
+    if n > len(ids):
+        raise ValueError(f"requested {n} rows but only {len(ids)} are available")
+    return [(index, ds[index]) for index in ids[:n]]
 
 
-def gsm_tasks(n: int, seed: int):
+def gsm_tasks(n: int, seed: int, excluded_indices: set[int] | None = None):
     ds = load_parquet("openai/gsm8k", "main/test-00000-of-00001.parquet")
     out = []
-    for row in sample_rows(ds, n, seed):
+    for source_index, row in sample_rows(ds, n, seed, excluded_indices):
         answer = row["answer"].split("####")[-1].strip().replace(",", "")
-        out.append({"benchmark": "gsm8k", "task_id": f"gsm8k:{len(out)}", "prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\n" + row["question"], "gold": answer})
+        out.append({"benchmark": "gsm8k", "task_id": f"gsm8k:test:{source_index}", "source_row_index": source_index, "content_sha256": content_sha256(row), "prompt": "Solve this grade-school math problem. Show concise reasoning, then write the final numeric answer on the last line.\n\n" + row["question"], "gold": answer})
     return out
 
 
-def humaneval_tasks(n: int, seed: int):
+def humaneval_tasks(n: int, seed: int, excluded_indices: set[int] | None = None):
     ds = load_parquet("openai/openai_humaneval", "openai_humaneval/test-00000-of-00001.parquet")
     out = []
-    for row in sample_rows(ds, n, seed):
-        out.append({"benchmark": "humaneval", "task_id": row["task_id"], "prompt": row["prompt"] + "\n\nComplete the function. Output only valid Python code.", "stub_prompt": row["prompt"], "gold": row["entry_point"], "test": row["test"], "entry_point": row["entry_point"]})
+    for source_index, row in sample_rows(ds, n, seed, excluded_indices):
+        out.append({"benchmark": "humaneval", "task_id": row["task_id"], "source_row_index": source_index, "content_sha256": content_sha256(row), "prompt": row["prompt"] + "\n\nComplete the function. Output only valid Python code.", "stub_prompt": row["prompt"], "gold": row["entry_point"], "test": row["test"], "entry_point": row["entry_point"]})
     return out
 
 
-def arc_tasks(n: int, seed: int):
+def arc_tasks(n: int, seed: int, excluded_indices: set[int] | None = None):
     ds = load_parquet("allenai/ai2_arc", "ARC-Challenge/test-00000-of-00001.parquet")
     out = []
-    for row in sample_rows(ds, n, seed):
+    for source_index, row in sample_rows(ds, n, seed, excluded_indices):
         choices = row["choices"]
         rendered = "\n".join(f"{label}. {text}" for label, text in zip(choices["label"], choices["text"]))
-        out.append({"benchmark": "arc_challenge", "task_id": f"arc:{len(out)}", "prompt": "Answer this multiple-choice science question. Return only the option letter.\n\nQuestion: " + row["question"] + "\n" + rendered, "gold": row["answerKey"]})
+        out.append({"benchmark": "arc_challenge", "task_id": f"arc:test:{source_index}", "source_row_index": source_index, "content_sha256": content_sha256(row), "prompt": "Answer this multiple-choice science question. Return only the option letter.\n\nQuestion: " + row["question"] + "\n" + rendered, "gold": row["answerKey"]})
     return out
 
 
@@ -59,12 +70,12 @@ def last_number(text: str):
 
 
 def check_gsm(pred: str, gold: str):
-    return last_number(pred) == gold
+    lines = [line.strip() for line in pred.strip().splitlines() if line.strip()]
+    return bool(lines) and last_number(lines[-1]) == gold and len(re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", lines[-1])) == 1
 
 
 def check_arc(pred: str, gold: str):
-    letters = re.findall(r"\b([A-E])\b", pred.upper())
-    return bool(letters) and letters[-1] == gold.upper()
+    return pred.strip().upper() == gold.upper()
 
 
 class Timeout(Exception): pass

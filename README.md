@@ -76,6 +76,20 @@ Only 12 of the 64 bank tasks produced successful base-model trajectories. The fi
 
 The important domain-matched comparison is GSM8K: LOPD-lite beat matched GRPO (0.333 vs. 0.300) and SFT (0.333 vs. 0.233), but did not beat the frozen base model (0.333 vs. 0.367). The overall score is not a pure math score because HumanEval and ARC are transfer checks. This is evidence that the method can use real successful math trajectories, not evidence that LOPD-lite is always better; the small bank and falling on-policy reward make this a pilot result. The implementation remains the lightweight LOPD-lite variant, not an exact reproduction of the paper's unreleased full QFormer training code.
 
+### Corrected rerun after the audit
+
+The initial domain-matched run exposed three implementation problems: SFT trained on answer-only completions despite a reasoning-format evaluator; LOPD distilled failed rollouts without Base retention; and the final LOPD round was used without validation-based checkpoint selection. Commit `f9bb6cf` fixes these issues. The corrected rerun also uses a lower SFT learning rate, 512-token training context, group-size-4 GRPO with sampled Base-reference retention, reward-gated LOPD distillation, and validation-selected LOPD checkpoints. The earlier artifacts remain available for comparison; the corrected artifacts are in `outputs/gsm8k_lopd_fixed/`, `outputs/gsm8k_domain_fixed_g4/`, and `outputs/real_benchmark_gsm8k_fixed/`.
+
+| Condition | Overall | GSM8K | HumanEval | ARC-Challenge |
+|---|---:|---:|---:|---:|
+| Base | 0.486 | 0.367 | 0.000 | 0.767 |
+| Static skill | 0.243 | 0.100 | 0.100 | 0.433 |
+| Corrected domain SFT | 0.429 | 0.267 | 0.000 | 0.733 |
+| Corrected domain GRPO | 0.443 | 0.333 | 0.000 | 0.700 |
+| Corrected domain LOPD-lite | 0.443 | 0.333 | 0.000 | 0.700 |
+
+The fixes reduced the damage from training, but none of the trained conditions exceeded the frozen Base on this 70-task suite. Relative to Base, corrected SFT lost 4 paired tasks, corrected GRPO lost 4 and gained 1, and corrected LOPD-lite lost 3. The result still indicates that this small 40-update-task pilot is data-limited and prone to transfer drift; it does not support the claim that training is always better than Base or that LOPD-lite is always better than GRPO.
+
 ## Design
 
 The benchmark has four exact-match task families: arithmetic, list filtering, string transformation, and constraint-following JSON. Each round uses fresh exploration tasks. Both improvement conditions see the same failed attempts, verifier feedback, and self-analysis prompt; only the storage mechanism differs.

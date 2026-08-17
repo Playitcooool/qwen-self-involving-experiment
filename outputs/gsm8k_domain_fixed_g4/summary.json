@@ -1,0 +1,20 @@
+{
+  "sft": {
+    "condition": "sft_gsm8k",
+    "tasks": 40,
+    "epochs": 2.0,
+    "seconds": 216.69435691833496,
+    "adapter": "outputs/gsm8k_domain_fixed_g4/sft/adapter",
+    "uses_gold_labels": true,
+    "target": "official GSM8K rationale followed by final numeric answer"
+  },
+  "grpo": {
+    "condition": "grpo_gsm8k",
+    "tasks": 40,
+    "rounds": 5,
+    "seconds": 1906.991770029068,
+    "adapter": "outputs/gsm8k_domain_fixed_g4/grpo/adapter",
+    "uses_gold_labels": false,
+    "reward": "group-relative exact GSM8K verifier reward"
+  }
+}
