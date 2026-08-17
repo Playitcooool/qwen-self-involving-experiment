@@ -413,6 +413,18 @@ class LOPDTrainer:
         return losses
 
     def update_rollout(self, task: Task, completion: str, reward: float) -> dict[str, Any]:
+        if reward <= 0.0:
+            # A failed trajectory supplies no useful privileged target. Skipping
+            # it prevents the composer/anchor constraints from learning from a
+            # rollout whose verifier rejected it.
+            return {
+                "task_id": task.task_id,
+                "family": task.family,
+                "reward": float(reward),
+                "distill_weight": 0.0,
+                "updated": False,
+                "skip_reason": "verifier_rejected_rollout",
+            }
         latents = self._compose(task)
         anchor = self._anchor(task, latents)
         student_logits, teacher_logits, reference_logits, target, _ = self._forward_pair(
@@ -434,10 +446,10 @@ class LOPDTrainer:
         # student.  The student receives the reward-gated distillation loss
         # below, while the reference KL prevents it from drifting from Base.
         delta = sampled_teacher - sampled_student.detach()
-        advantage = 2.0 * float(reward) - 1.0
+        advantage = 1.0
         privilege = (advantage * delta).mean()
         anchor_loss = (latents - anchor).pow(2).mean()
-        distill_weight = float(reward)
+        distill_weight = 1.0
         distill_loss = distill_weight * kl_mean
         loss = (
             distill_loss

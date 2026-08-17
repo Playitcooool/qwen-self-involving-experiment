@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from experiment import Task
-from real_benchmark import load_parquet
+from real_benchmark import DATASET_REVISIONS, DATA_CACHE, load_parquet
+from reproducibility import content_sha256, sha256_file
 
 
 GSM8K_REPO = "openai/gsm8k"
@@ -156,8 +157,14 @@ def build_gsm8k_splits(
         validation=validation,
         source={
             "dataset": f"{GSM8K_REPO}/{GSM8K_CONFIG}",
+            "revision": DATASET_REVISIONS[GSM8K_REPO],
             "split": "train",
             "row_count": len(rows),
+            "source_file_sha256": sha256_file(DATA_CACHE / "openai__gsm8k__main__train-00000-of-00001.parquet"),
+            "selected_rows_sha256": {
+                f"gsm8k:train:{index}": content_sha256(rows[index])
+                for index in bank_indices + [item for group in update_indices_by_round for item in group] + validation_indices
+            },
             "seed": seed,
             "requested_bank_tasks": bank_tasks,
             "requested_update_tasks": rounds * tasks_per_round,
@@ -173,11 +180,21 @@ def build_gsm8k_splits(
 def load_gsm8k_splits_from_manifest(path: Path) -> GSM8KDataSplits:
     manifest = json.loads(path.read_text())
     rows = load_gsm8k_rows("train")
+    source = manifest["source"]
+    if source.get("revision") != DATASET_REVISIONS[GSM8K_REPO]:
+        raise RuntimeError("GSM8K manifest revision does not match the pinned dataset revision")
+    current_file_hash = sha256_file(DATA_CACHE / "openai__gsm8k__main__train-00000-of-00001.parquet")
+    if source.get("source_file_sha256") != current_file_hash:
+        raise RuntimeError("cached GSM8K train file does not match the frozen manifest")
+    for task_id, expected_hash in source.get("selected_rows_sha256", {}).items():
+        index = int(task_id.rsplit(":", 1)[-1])
+        if content_sha256(rows[index]) != expected_hash:
+            raise RuntimeError(f"GSM8K source row changed: {task_id}")
     data = GSM8KDataSplits(
         bank=tasks_from_ids(rows, manifest["bank_task_ids"]),
         update_rounds=[tasks_from_ids(rows, ids) for ids in manifest["update_task_ids_by_round"]],
         validation=tasks_from_ids(rows, manifest["validation_task_ids"]),
-        source=manifest["source"],
+        source=source,
     )
     actual = data.manifest()
     if actual["bank_task_ids"] != manifest["bank_task_ids"]:

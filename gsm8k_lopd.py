@@ -26,6 +26,7 @@ import torch
 from gsm8k_data import build_gsm8k_splits, load_gsm8k_splits_from_manifest, write_manifest
 from lopd_lite import LOPDTrainer, device_name, git_revision
 from experiment import normalize
+from reproducibility import package_versions, seed_everything
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -74,8 +75,7 @@ def write_metrics(path: Path, rows: list[dict[str, object]]) -> None:
 
 def main() -> None:
     args = build_parser().parse_args()
-    random.seed(args.seed)
-    torch.manual_seed(args.seed)
+    seed_everything(args.seed)
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
     manifest_path = Path(args.data_manifest) if args.data_manifest else None
@@ -97,6 +97,8 @@ def main() -> None:
                 "torch": torch.__version__,
                 "device": device_name(),
                 "git_revision": git_revision(),
+                "packages": package_versions(),
+                "deterministic_algorithms": True,
                 "method": "LOPD-lite: domain-matched GSM8K reward-weighted latent on-policy self-distillation",
                 "training_dataset": data.source,
                 "gold_answers_as_model_input": False,
@@ -123,8 +125,16 @@ def main() -> None:
     log_rows: list[dict[str, object]] = []
     round_rows: list[dict[str, object]] = []
     validation_rows: list[dict[str, object]] = []
-    best_round: int | None = None
+    best_round = 0
     best_validation_accuracy = -1.0
+    baseline_hits = 0
+    for task in data.validation:
+        prediction = trainer.generate(task.prompt, sample=False)
+        correct = normalize(prediction, task.family) == normalize(task.answer, task.family)
+        baseline_hits += int(correct)
+        validation_rows.append({"round": 0, "task_id": task.task_id, "prediction": prediction, "correct": correct})
+    best_validation_accuracy = baseline_hits / len(data.validation) if data.validation else 0.0
+    round_rows.append({"round": 0, "condition": "lopd_lite_gsm8k", "validation_accuracy": best_validation_accuracy, "updated_tasks": 0, "bank_size": len(bank), "beta": trainer.beta})
     for round_no, round_tasks in enumerate(data.update_rounds, start=1):
         rewards: list[float] = []
         update_start = time.time()
@@ -177,12 +187,6 @@ def main() -> None:
             best_validation_accuracy = validation_accuracy
             best_round = round_no
 
-    if best_round is None:
-        if not data.update_rounds:
-            raise RuntimeError("cannot select a LOPD checkpoint without training rounds")
-        best_round = len(data.update_rounds)
-        best_validation_accuracy = 0.0
-
     write_metrics(out / "metrics.csv", round_rows)
     with (out / "training_log.jsonl").open("w") as handle:
         for row in log_rows:
@@ -192,15 +196,14 @@ def main() -> None:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     final_adapter = trainer.save(out, args)
     best_adapter = out / "adapters" / "best"
-    shutil.copytree(
-        out / "adapters" / f"round_{best_round}",
-        best_adapter,
-        dirs_exist_ok=True,
-    )
+    selected_adapter: str | None = None
+    if best_round > 0:
+        shutil.copytree(out / "adapters" / f"round_{best_round}", best_adapter, dirs_exist_ok=True)
+        selected_adapter = str(best_adapter)
     (out / "final_checkpoint.json").write_text(
         json.dumps(
             {
-                "adapter": str(best_adapter),
+                "adapter": selected_adapter,
                 "final_adapter": str(final_adapter),
                 "selected_round": best_round,
                 "validation_accuracy": best_validation_accuracy,
@@ -217,10 +220,14 @@ def main() -> None:
         f"- GSM8K validation-only tasks: **{len(data.validation)}**\n"
         f"- Latent tokens: **{args.latent_tokens}**; retrieved experiences: **{args.retrieve_top_k}**\n"
         f"- Final student adapter: `{final_adapter}`\n"
-        f"- Selected adapter: `{best_adapter}` (round **{best_round}**, validation accuracy **{best_validation_accuracy:.3f}**)\n"
+        f"- Selected adapter: `{selected_adapter}` (round **{best_round}**, validation accuracy **{best_validation_accuracy:.3f}**)\n"
         f"- Total training wall time: **{time.time() - started:.1f}s**\n\n"
         + "\n".join(
-            f"- Round {row['round']}: mean verifier reward **{row['mean_train_reward']:.3f}**, validation accuracy **{row['validation_accuracy']:.3f}**"
+            (
+                f"- Round {row['round']}: validation accuracy **{row['validation_accuracy']:.3f}**"
+                if row["round"] == 0
+                else f"- Round {row['round']}: mean verifier reward **{row['mean_train_reward']:.3f}**, validation accuracy **{row['validation_accuracy']:.3f}**"
+            )
             for row in round_rows
         )
         + "\n\n"

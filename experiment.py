@@ -75,11 +75,13 @@ class Runner:
 def normalize(x: str, family: str | None = None) -> str:
     x = x.strip().replace("```json", "").replace("```", "").strip()
     if family == "gsm8k":
-        # GSM8K answers are checked from the final numeric value.  The
-        # reasoning trace is allowed in the rollout, but only its final
-        # number is used by the verifier.
-        nums = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", x)
-        return nums[-1].replace(",", "") if nums else ""
+        # Require one numeric value on the final non-empty line. This matches
+        # the public evaluator and rejects trailing or ambiguous answer text.
+        lines = [line.strip() for line in x.splitlines() if line.strip()]
+        if not lines:
+            return ""
+        nums = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", lines[-1])
+        return nums[0].replace(",", "") if len(nums) == 1 else ""
     if family == "arithmetic":
         nums = re.findall(r"(?<!\d)-?\d+(?!\d)", x)
         return nums[-1] if nums else ""
